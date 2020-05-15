@@ -1,3 +1,5 @@
+#!usr/bin/python3.6
+
 #Run this script to get dictionnaries of a given length
 
 f = open("english.txt")
