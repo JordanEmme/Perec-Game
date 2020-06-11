@@ -1,5 +1,5 @@
-# Pennac-Game
-A program to play Perec's Game
+# Perec Game
+A little python program to play Perec's Game
 
 
 TODO:
