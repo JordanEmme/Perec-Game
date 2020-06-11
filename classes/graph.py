@@ -54,9 +54,13 @@ class Graph():
                 neighbours.add(vertex2)
         return neighbours
     
-    def shortest_path(self, start, target):
+    def graph_distance(self, start, target, distance_tree = False ):
         """Takes three arguments: a graph, a starting vertex in the graph and a target, and returns
-        a shortest path as a list of vertices.
+        the combinatorial distance between these vertices.
+        
+        If the option distance_tree is set to True, the function returns a dictionary whose keys are
+        visited vertices during the program execution and whose arguments are the combinatorial distances 
+        relative to start.
         
         """
         if (start not in self._vertices):
@@ -65,25 +69,44 @@ class Graph():
             raise ValueError("Vertex {} is not in the graph".format(target))
         totreat = [start]
         marked = set([start])
-        paths = [[start]]
-        shortest_path = []
+        tree = {start: 0}
         while totreat and target not in marked:
             v = totreat.pop(0)
-            n = self.neighbours(v)
-            for p in paths:
-                if p[-1] == v:
-                    for vertex in n:
-                        paths.append(p + [vertex])                    
-            totreat += [vertex for vertex in n if vertex not in marked]
+            n = [vertex for vertex in self.neighbours(v) if vertex not in marked] 
+            totreat += n
             for vertex in n:
-                marked.add(vertex)
-        for p in paths:
-            if p[-1] == target:
-                shortest_path = p
-                break
+                tree[vertex] = tree[v] + 1
+                marked.add(vertex)                 
         if target not in marked:
-            return('Sorry, there is no path between these points')
+            return float('inf')
+        elif distance_tree:
+            return tree
         else:
-            return shortest_path
+            return tree[target]
+        
+        
+    def shortest_path(self, start, target):
+        """Takes three arguments: a graph, a starting vertex in the graph and a target, and returns
+        a shortest path as a list of vertices.
+        
+        
+        """
+        distances = self.graph_distance(start, target, True)
+        if distances == float('inf'):
+            raise ValueError('These vertices are not connected')
+        cursor = target
+        dist = distances[cursor]
+        list_by_dist = [set() for i in range(dist +1)]
+        path = [target]
+        for vertex in distances:
+            list_by_dist[distances[vertex]].add(vertex)
+        while cursor != start:
+            for vertex in self.neighbours(cursor):
+                if vertex in list_by_dist[dist - 1]:
+                    path = [vertex] + path
+                    cursor = vertex
+                    dist -= 1
+        return path
+       
         
        
